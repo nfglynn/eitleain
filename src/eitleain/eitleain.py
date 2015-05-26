@@ -22,12 +22,16 @@ class Eitleain(object):
             aircraft.update(data_point)
 
     def from_flight_code(self, flight_code):
-        for aircraft in self.aircraft:
+        self.update()
+        for aircraft in self.aircraft.values():
             if aircraft.flight_code and aircraft.flight_code == flight_code:
                 return aircraft
 
     def from_hex_code(self, hex_code):
-        return self.aircraft.get(hex_code, None)
+        self.update()
+        for aircraft in self.aircraft.values():
+            if aircraft.hex_code and aircraft.hex_code == hex_code:
+                return aircraft
 
     @property
     def all(self):

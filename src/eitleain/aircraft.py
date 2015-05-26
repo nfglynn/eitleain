@@ -53,7 +53,7 @@ class AircraftID(object):
                    hex_code=data['hex'])
 
     def __init__(self, flight_code, hex_code):
-        self.flight_code = flight_code if flight_code.strip() else None
+        self._flight_code = flight_code.strip() if flight_code.strip() else None
         self.hex_code = hex_code
 
     def __eq__(self, other):
@@ -71,8 +71,17 @@ class AircraftID(object):
     def __repr__(self):
         return '<{self.__class__.__name__}: {self}>'.format(self=self)
 
+    @property
+    def flight_code(self):
+        return self._flight_code
+
+    @flight_code.setter
+    def flight_code(self, val):
+        self._flight_code = val.strip()
+
     def as_dict(self):
-        return self.__dict__
+        return {'flight_code': self.flight_code,
+                'hex_code': self.hex_code}
 
 
 class TrackedAircraft(object):
@@ -83,11 +92,11 @@ class TrackedAircraft(object):
         self.data = data if data is not None else []
 
     @property
-    def flight_code(self): # -> Optional[str | bool]:
+    def flight_code(self):  # -> Optional[str | bool]:
         return self.aircraft_id.flight_code
 
     @flight_code.setter
-    def set_flight_code(self, flight_code):
+    def flight_code(self, flight_code):
         if self.flight_code is not None:
             m = "Can't set flight_code: {} -> {}"
             raise Exception(m.format(self.flight_code,
@@ -123,5 +132,5 @@ class TrackedAircraft(object):
         if history is False:
             details['data'] = [self.last.as_dict()]
         elif history is True:
-            details['data'] = [d.as_dict() for d in self.data]
+            details['data'] = [d.as_dict() for d in reversed(self.data)]
         return details

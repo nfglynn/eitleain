@@ -24,16 +24,18 @@ eitleain = Eitleain()
 
 class AircraftConverter(BaseConverter):
     def to_python(self, value):
-        if value and value[0].isalpha():
+        aircraft_name = value.strip()
+        if aircraft_name and aircraft_name[0].isalpha():
             # assume a flight code
-            aircraft = eitleain.from_flight_code(value)
+            aircraft = eitleain.from_flight_code(aircraft_name)
         else:
             # assume a hex code
-            aircraft = eitleain.from_hex_code(value)
+            aircraft = eitleain.from_hex_code(aircraft_name)
         if aircraft is not None:
             return aircraft
         else:
-            raise Exception("Unknown Flight {}".format(value))
+            import ipdb; ipdb.set_trace()
+            raise Exception("Unknown Flight {}".format(aircraft_name))
 
     def to_url(self, aircraft):
         return '+'.join(BaseConverter.to_url(str(a))
