@@ -60,6 +60,10 @@ class AircraftDetails(Resource):
         return aircraft.as_dict(history=True)
 
 
+@app.route('/render')
+def render():
+    return render_template('render.html')
+
 api.add_resource(AircraftList, '/speir/<string:method>')
 api.add_resource(AircraftDetails, '/details/<aircraft:aircraft>')
 

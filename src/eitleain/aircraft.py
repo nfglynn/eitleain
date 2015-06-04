@@ -1,9 +1,9 @@
 import time
-from backports.typing import Dict, Optional, List
+from backports.typing import Dict, Optional, List, Generic, TypeVar
 
 
 class DataPoint(object):
-    __slots__ = ["altitude", "speed", "lat", "lon", "track", "time"]
+    __slots__ = ["altitude", "speed", "lat", "lon", "track", "time", "seen"]
 
     @classmethod
     def fromData(cls, data: Dict):
@@ -11,20 +11,22 @@ class DataPoint(object):
         params["time"] = time.time()
         return cls(**params)
 
-    def __init__(self, altitude, speed, lat, lon, track, time):
+    def __init__(self, altitude, speed, lat, lon, track, time, seen):
         self.altitude = altitude
         self.speed = speed
         self.lat = lat
         self.lon = lon
         self.track = track
         self.time = time
+        self.seen = seen
 
     def __hash__(self):
         return hash((self.altitude,
                      self.speed,
                      self.lat,
                      self.lon,
-                     self.track))
+                     self.track,
+                     self.seen))
 
     def __eq__(self, other):
         return hash(self) == hash(other)
@@ -43,7 +45,8 @@ class DataPoint(object):
                 'altitude': self.altitude,
                 'lat': self.lat,
                 'lon': self.lon,
-                'time': self.time}
+                'time': self.time,
+                'seen': self.seen}
 
 
 class AircraftID(object):

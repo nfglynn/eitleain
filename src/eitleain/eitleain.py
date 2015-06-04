@@ -1,3 +1,6 @@
+import json
+import asyncio
+import asyncio_redis
 import time
 
 from .radar import Dump1090
@@ -9,9 +12,12 @@ class Eitleain(object):
         self.radar = Dump1090()
         self.aircraft = {}
 
-    def update(self):
-        print('update! {}'.format(time.time()))
-        for aircraft_id, data_point in self.radar.scan():
+    @asyncio.coroutine
+    def watch(self):
+        connection = yield from asyncio_redis.Connection.create()
+        while True:
+            aircraft_id, data_point = yield from self.radar.scan()
+            print(aircraft_id)
             if aircraft_id in self.aircraft:
                 aircraft = self.aircraft[aircraft_id]
             else:
@@ -20,6 +26,9 @@ class Eitleain(object):
             if not aircraft.flight_code and aircraft_id.flight_code:
                 aircraft.flight_code = aircraft_id.flight_code
             aircraft.update(data_point)
+            data = {'aircraft': aircraft.as_dict(),
+                    'update': aircraft.last.as_dict()}
+            yield from connection.publish('eitleain', json.dumps(data))
 
     def from_flight_code(self, flight_code):
         self.update()

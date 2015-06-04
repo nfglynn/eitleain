@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import requests
+import asyncio
 
 from .aircraft import AircraftID, DataPoint
 
@@ -15,19 +16,22 @@ class Dump1090(object):
         return "http://127.0.0.1:8080/data.json"
 
     def __init__(self):
-        self.proc = None
+        pass
 
+    @asyncio.coroutine
     def status(self):
         try:
-            response = requests.get(self.uri)
-            return json.loads(response.text)
+            yield from json.loads(requests.get(self.uri).text)
         except Exception:
             pass
 
+    @asyncio.coroutine
     def scan(self):
-        info = self.status()
-        if info is not None:
-            for data in info:
-                aircraft_id = AircraftID.fromData(data)
-                data_point = DataPoint.fromData(data)
-                yield (aircraft_id, data_point)
+        while True:
+            info = self.status()
+            if info is not None:
+                for data in info:
+                    aircraft_id = AircraftID.fromData(data)
+                    data_point = DataPoint.fromData(data)
+                    return (aircraft_id, data_point)
+            yield from asyncio.sleep(1)
