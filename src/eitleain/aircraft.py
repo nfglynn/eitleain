@@ -25,8 +25,8 @@ class DataPoint(object):
                      self.speed,
                      self.lat,
                      self.lon,
-                     self.track,
-                     self.seen))
+                     self.track))
+                     #, self.seen))
 
     def __eq__(self, other):
         return hash(self) == hash(other)

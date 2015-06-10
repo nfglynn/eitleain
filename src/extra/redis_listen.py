@@ -15,10 +15,10 @@ def listen(channel):
     while True:
         msg = yield from subscriber.next_published()
         try:
-            decoded = pprint.pformat(json.loads(msg.value()))
+            decoded = pprint.pformat(json.loads(msg.value))
         except Exception:
-            decoded = str(msg)
-        print("{}: {}".format(time.asctime(), decoded))
+            decoded = msg.value
+        print("{}:\n{}\n".format(time.asctime(), decoded))
 
     connection.close()
 
